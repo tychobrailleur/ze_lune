@@ -1,8 +1,10 @@
+#-*- encoding: utf-8 -*-
 $:.unshift File.join(File.dirname(__FILE__), "models")
 
 require 'twitter'
 require 'moon'
 require 'helpers'
+require 'iconv'
 
 class Tweet
   def initialize(global_config)
@@ -22,12 +24,22 @@ class Tweet
   def process
     mentions = get_latest_mentions
     mentions.map do |status|
-      if status.text =~ /phase/i
+      puts status.text
+      ic = Iconv.new('UTF-8', 'WINDOWS-1252')
+      question = ic.iconv(status.text)
+
+      text = nil
+      if question =~ /phase/i
         text = translate_moon_phase(@moon.phase)
-        respond_to(status, text)
-      elsif status.text =~ /aphélie/i
-        text = ""
+      elsif question =~ /aphélie/i
+        text = "405 696 km"
+      elsif question =~ /périhélie/i
+        text = "363 104 km"
+      elsif question =~ /premier\s+homme.*march.*/i
+        text = "Neil Armstrong, le 21 juillet 1969, à 2 h 56 UTC — http://tinyurl.com/l9lafy"
       end
+
+      respond_to(status, text) if text != nil
     end
   end
   
@@ -48,3 +60,7 @@ class Tweet
     Twitter.update("@#{tweet.from_user}: #{text}", {:in_reply_to_status_id => tweet.id})
   end
 end
+
+require 'yaml'
+global_config = YAML.load_file(File.join(File.dirname(__FILE__), "config", "production.yml"))
+Tweet.new(global_config).process
