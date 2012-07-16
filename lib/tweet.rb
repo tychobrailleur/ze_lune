@@ -4,7 +4,6 @@ $:.unshift File.join(File.dirname(__FILE__), "models")
 require 'twitter'
 require 'moon'
 require 'helpers'
-require 'iconv'
 
 class Tweet
   def initialize(global_config)
@@ -13,7 +12,7 @@ class Tweet
       config.consumer_secret = global_config["twitter"]["consumer_secret"]
       config.oauth_token =  global_config["twitter"]["oauth_token"]
       config.oauth_token_secret = global_config["twitter"]["oauth_token_secret"]
-      config.user_agent = 'Ze Lune'
+ #     config.user_agent = 'Ze Lune'
 
       @last_seen_id = global_config["twitter"]["last_seen_id"]
       @moon = Moon.new
@@ -25,8 +24,7 @@ class Tweet
     mentions = get_latest_mentions
     mentions.map do |status|
       puts status.text
-      ic = Iconv.new('UTF-8', 'WINDOWS-1252')
-      question = ic.iconv(status.text)
+      question = status.text.encode('UTF-8')
 
       text = nil
       if question =~ /phase/i
@@ -60,7 +58,3 @@ class Tweet
     Twitter.update("@#{tweet.from_user}: #{text}", {:in_reply_to_status_id => tweet.id})
   end
 end
-
-require 'yaml'
-global_config = YAML.load_file(File.join(File.dirname(__FILE__), "config", "production.yml"))
-Tweet.new(global_config).process

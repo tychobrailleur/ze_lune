@@ -1,4 +1,5 @@
 $:.unshift File.join(File.dirname(__FILE__), "models")
+$:.unshift File.join(File.dirname(__FILE__), "lib")
 
 require 'rubygems'
 require 'sinatra'
