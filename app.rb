@@ -13,9 +13,9 @@ require 'moon'
 
 scheduler = Rufus::Scheduler.start_new
 tweet_handler = Tweet.new
-#scheduler.every '2m' do
+scheduler.every '2m' do
   tweet_handler.process
-#end
+end
 
 get '/tasks' do
   scheduler.all_jobs.to_s
