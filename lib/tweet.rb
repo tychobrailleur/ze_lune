@@ -39,7 +39,7 @@ class Tweet
 
 
   def respond_to(tweet, text)
-    #client().update("@#{tweet.from_user}: #{text}", {:in_reply_to_status_id => tweet.id})
+    client().update("@#{tweet.from_user}: #{text}", {:in_reply_to_status_id => tweet.id})
   end
 
   def client
